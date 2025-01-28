@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="CyberThreatIntelligenceDB3ModelStoreContainer" CdmEntityContainer="CyberThreatIntelligenceDB3Entities">
+    <EntitySetMapping Name="Attacks">
+      <EntityTypeMapping TypeName="CyberThreatIntelligenceDB3Model.Attack">
+        <MappingFragment StoreEntitySet="Attack">
+          <ScalarProperty Name="AttackID" ColumnName="AttackID" />
+          <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+          <ScalarProperty Name="Severity" ColumnName="Severity" />
+          <ScalarProperty Name="AttackType" ColumnName="AttackType" />
+          <ScalarProperty Name="HoneypotID" ColumnName="HoneypotID" />
+          <ScalarProperty Name="AttackerID" ColumnName="AttackerID" />
+          <ScalarProperty Name="VulnerabilityID" ColumnName="VulnerabilityID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Attackers">
+      <EntityTypeMapping TypeName="CyberThreatIntelligenceDB3Model.Attacker">
+        <MappingFragment StoreEntitySet="Attacker">
+          <ScalarProperty Name="AttackerID" ColumnName="AttackerID" />
+          <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
+          <ScalarProperty Name="FirstSeen" ColumnName="FirstSeen" />
+          <ScalarProperty Name="Country" ColumnName="Country" />
+          <ScalarProperty Name="LastActivity" ColumnName="LastActivity" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Honeypots">
+      <EntityTypeMapping TypeName="CyberThreatIntelligenceDB3Model.Honeypot">
+        <MappingFragment StoreEntitySet="Honeypot">
+          <ScalarProperty Name="HoneypotID" ColumnName="HoneypotID" />
+          <ScalarProperty Name="Location" ColumnName="Location" />
+          <ScalarProperty Name="IPRange" ColumnName="IPRange" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="ModifiedTime" ColumnName="ModifiedTime" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IncidentReports">
+      <EntityTypeMapping TypeName="CyberThreatIntelligenceDB3Model.IncidentReport">
+        <MappingFragment StoreEntitySet="IncidentReport">
+          <ScalarProperty Name="IncidentReportID" ColumnName="IncidentReportID" />
+          <ScalarProperty Name="ReportDate" ColumnName="ReportDate" />
+          <ScalarProperty Name="ModifiedTime" ColumnName="ModifiedTime" />
+          <ScalarProperty Name="Details" ColumnName="Details" />
+          <ScalarProperty Name="HoneypotID" ColumnName="HoneypotID" />
+          <ScalarProperty Name="AttackID" ColumnName="AttackID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Malwares">
+      <EntityTypeMapping TypeName="CyberThreatIntelligenceDB3Model.Malware">
+        <MappingFragment StoreEntitySet="Malware">
+          <ScalarProperty Name="MalwareID" ColumnName="MalwareID" />
+          <ScalarProperty Name="Signature" ColumnName="Signature" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="AttackID" ColumnName="AttackID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Vulnerabilities">
+      <EntityTypeMapping TypeName="CyberThreatIntelligenceDB3Model.Vulnerability">
+        <MappingFragment StoreEntitySet="Vulnerability">
+          <ScalarProperty Name="VulnerabilityID" ColumnName="VulnerabilityID" />
+          <ScalarProperty Name="CVEIdentifier" ColumnName="CVEIdentifier" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="SeverityLevel" ColumnName="SeverityLevel" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

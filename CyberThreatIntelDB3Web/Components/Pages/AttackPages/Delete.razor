@@ -1,0 +1,88 @@
+﻿@page "/attacks/delete"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+	<h2>Attack</h2>
+	<hr />
+	@if (Attack is null)
+	{
+		<p><em>Loading...</em></p>
+	}
+	else
+	{
+		<dl class="row">
+			<dt class="col-sm-2">Timestamp</dt>
+			<dd class="col-sm-10">@Attack.Timestamp</dd>
+		</dl>
+		<dl class="row">
+			<dt class="col-sm-2">Severity</dt>
+			<dd class="col-sm-10">@Attack.Severity</dd>
+		</dl>
+		<dl class="row">
+			<dt class="col-sm-2">AttackType</dt>
+			<dd class="col-sm-10">@Attack.AttackType</dd>
+		</dl>
+		<dl class="row">
+			<dt class="col-sm-2">HoneypotID</dt>
+			<dd class="col-sm-10">@Attack.HoneypotID</dd>
+		</dl>
+		<dl class="row">
+			<dt class="col-sm-2">AttackerID</dt>
+			<dd class="col-sm-10">@Attack.AttackerID</dd>
+		</dl>
+		<dl class="row">
+			<dt class="col-sm-2">VulnerabilityID</dt>
+			<dd class="col-sm-10">@Attack.VulnerabilityID</dd>
+		</dl>
+		<EditForm method="post" Model="Attack" OnValidSubmit="DeleteAttack" FormName="delete" Enhance>
+			<button type="submit" class="btn btn-danger" disabled="@(Attack is null)">Delete</button> |
+			<a href="/attacks">Back to List</a>
+		</EditForm>
+	}
+</div>
+
+@code {
+	private Attack? Attack;
+
+	[SupplyParameterFromQuery]
+	private int AttackID { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		using var context = DbFactory.CreateDbContext();
+		Attack = await context.Attack.FirstOrDefaultAsync(m => m.AttackID == AttackID);
+
+		if (Attack is null)
+		{
+			NavigationManager.NavigateTo("notfound");
+		}
+	}
+
+	private async Task DeleteAttack()
+	{
+		using var context = DbFactory.CreateDbContext();
+
+		List<IncidentReport>? IncidentReports = await Scripts.ListConditionAsync<IncidentReport>(context, (E => E.AttackID == Attack!.AttackID));
+		foreach (IncidentReport IncidentReport in IncidentReports)
+		{
+			context.IncidentReport.Remove(IncidentReport);
+		}
+		List<Malware>? Malwares = await Scripts.ListConditionAsync<Malware>(context, (E => E.AttackID == Attack!.AttackID));
+		foreach (Malware Malware in Malwares)
+		{
+			context.Malware.Remove(Malware);
+		}
+
+		context.Attack.Remove(Attack!);
+		await context.SaveChangesAsync();
+		NavigationManager.NavigateTo("/attacks");
+	}
+}

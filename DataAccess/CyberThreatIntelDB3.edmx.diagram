@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="6da957959eab44f283a7fc02695febb8" Name="Diagram1" ZoomLevel="81">
+        <EntityTypeShape EntityType="CyberThreatIntelligenceDB3Model.Attack" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CyberThreatIntelligenceDB3Model.Attacker" Width="1.5" PointX="0.5" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CyberThreatIntelligenceDB3Model.Honeypot" Width="1.5" PointX="0.75" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="CyberThreatIntelligenceDB3Model.IncidentReport" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="CyberThreatIntelligenceDB3Model.Malware" Width="1.5" PointX="5.25" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="CyberThreatIntelligenceDB3Model.Vulnerability" Width="1.5" PointX="0.75" PointY="7.625" IsExpanded="true" />
+        <AssociationConnector Association="CyberThreatIntelligenceDB3Model.FK__Attack__Attacker__4222D4EF" ManuallyRouted="false" />
+        <AssociationConnector Association="CyberThreatIntelligenceDB3Model.FK__Attack__Honeypot__412EB0B6" ManuallyRouted="false" />
+        <AssociationConnector Association="CyberThreatIntelligenceDB3Model.FK__Attack__Vulnerab__4316F928" ManuallyRouted="false" />
+        <AssociationConnector Association="CyberThreatIntelligenceDB3Model.FK__IncidentR__Attac__4D94879B" ManuallyRouted="false" />
+        <AssociationConnector Association="CyberThreatIntelligenceDB3Model.FK__Malware__AttackI__49C3F6B7" ManuallyRouted="false" />
+        <AssociationConnector Association="CyberThreatIntelligenceDB3Model.FK__IncidentR__Honey__4CA06362" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

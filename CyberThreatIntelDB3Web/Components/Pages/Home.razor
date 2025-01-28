@@ -1,0 +1,107 @@
+﻿@page "/"
+@using System.Globalization
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+@if (Attacks == null | AttackTypes == null | Attackers == null | Countrys == null)
+{
+	<p>Loading...</p>
+}
+else
+{
+	<h1>Charts</h1>
+
+	<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+		<p>Attack Type -> Attack Count</p>
+		<RadzenChart ColorScheme="ColorScheme.Palette">
+			<RadzenPieSeries Data="@AttacksPieItems" Title="Attack Count" CategoryProperty="AttackType" ValueProperty="AttackCount">
+				<RadzenSeriesDataLabels Visible="@showDataLabels" />
+			</RadzenPieSeries>
+		</RadzenChart>
+		<RadzenChart>
+			<RadzenColumnSeries Data="@AttackerChartItems" CategoryProperty="Country" Title="Attackers" ValueProperty="AttackerCount">
+				<RadzenSeriesDataLabels Visible="@showDataLabels" />
+			</RadzenColumnSeries>
+			<RadzenColumnOptions Radius="5" />
+			<RadzenValueAxis Min="0">
+				<RadzenGridLines Visible="true" />
+				<RadzenAxisTitle Text="Attacker Count" />
+			</RadzenValueAxis>
+		</RadzenChart>
+	</RadzenStack>
+}
+
+@code {
+	private List<Attack>? Attacks;
+	private List<Attack>? AttackTypes;
+
+	private List<Attacker>? Attackers;
+	private List<Attacker>? Countrys;
+
+	private bool showDataLabels = true;
+
+	private List<AttacksPieItem> AttacksPieItems = new List<AttacksPieItem>();
+	private List<AttackerChartItem> AttackerChartItems = new List<AttackerChartItem>();
+
+
+	class AttacksPieItem
+	{
+		public string? AttackType { get; set; }
+		public int AttackCount { get; set; }
+	}
+
+
+	class AttackerChartItem
+	{
+		public string? Country { get; set; }
+		public int AttackerCount { get; set; }
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		var context = DbFactory.CreateDbContext();
+
+		if (context is null)
+		{
+			NavigationManager.NavigateTo("notfound");
+		}
+		else
+		{
+			Attacks = await context.Attack.ToListAsync<Attack>();
+			Attackers = await context.Attacker.ToListAsync<Attacker>();
+
+			this.AttackTypes = Attacks.GroupBy(E => E.AttackType).Select(V => V.First()).ToList();
+			var attackTypes = this.AttackTypes.Distinct().ToList();
+
+			this.Countrys = Attackers.GroupBy(E => E.Country).Select(V => V.First()).ToList();
+			var countrys = this.Countrys.Distinct().ToList();
+			foreach (var attackType in attackTypes)
+			{
+				int AttackCount = context.Attack.Where(E => E.AttackType == attackType.AttackType).ToList().Count;
+				AttacksPieItems.Add(new AttacksPieItem
+					{
+						AttackType = attackType.AttackType,
+						AttackCount = AttackCount
+					});
+			}
+
+			foreach (var country in countrys)
+			{
+				int atteckerCount = context.Attacker.Where(E => E.Country == country.Country).ToList().Count;
+				AttackerChartItems.Add(new AttackerChartItem
+					{
+						Country = country.Country,
+						AttackerCount = atteckerCount
+					});
+			}
+
+
+
+		}
+	}
+}

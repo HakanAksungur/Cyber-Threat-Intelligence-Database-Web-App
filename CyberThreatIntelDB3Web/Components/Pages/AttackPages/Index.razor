@@ -1,0 +1,67 @@
+﻿@page "/attacks"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using DataAccess
+@using CyberThreatIntelDB3Web.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+
+<PageTitle>Attacks</PageTitle>
+
+
+
+@if (Attacks is null)
+{
+	<p>Loading...</p>
+}
+else
+{
+	<h1>Attacks Targeted on Honeypots</h1>
+
+	<p>
+		<a href="attacks/create">Create New</a>
+	</p>
+	<QuickGrid Class="table" Items="@(Attacks.AsQueryable<Attack>())">
+		<PropertyColumn Property="attack => attack.Timestamp" />
+		<PropertyColumn Property="attack => attack.Severity" />
+		<PropertyColumn Property="attack => attack.AttackType" Title="Attack Type" />
+		<PropertyColumn Property="attack => attack.Honeypot.Location" Title="Honeypot Location" />
+		<PropertyColumn Property="attack => attack.Attacker.IPAddress" Title="Attacker IP" />
+		<PropertyColumn Property="attack => attack.Vulnerability.CVEIdentifier" Title="Vulnerability" />
+
+		<TemplateColumn Context="attack">
+			<a href="@($"attacks/edit?attackid={attack.AttackID}")">Edit</a> |
+			<a href="@($"attacks/details?attackid={attack.AttackID}")">Details</a> |
+			<a href="@($"attacks/delete?attackid={attack.AttackID}")">Delete</a>
+		</TemplateColumn>
+	</QuickGrid>
+}
+
+
+@code {
+	private CyberThreatIntelDB3WebContext context = default!;
+	private List<Attack>? Attacks { get; set; }
+
+	protected override void OnInitialized()
+	{
+		context = DbFactory.CreateDbContext();
+		Attacks = context.Attack.ToList();
+
+		foreach (Attack attack in Attacks)
+		{
+			attack.Honeypot = context.Honeypot.Single<Honeypot>(e => e.HoneypotID == attack.HoneypotID);
+			attack.Attacker = context.Attacker.Single<Attacker>(e => e.AttackerID == attack.AttackerID);
+			attack.Vulnerability = context.Vulnerability.Single<Vulnerability>(e => e.VulnerabilityID == attack.VulnerabilityID);
+
+		}
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
+
+
+
+
+
+
+        CyberThreatIntelDB3WebContext

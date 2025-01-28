@@ -1,0 +1,126 @@
+﻿@page "/incidentreports/edit"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>IncidentReport</h2>
+<hr />
+@if (IncidentReport is null | Honeypots == null | Attacks == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<div class="row">
+		<div class="col-md-4">
+			<EditForm method="post" Model="IncidentReport" OnValidSubmit="UpdateIncidentReport" FormName="edit" Enhance>
+				<DataAnnotationsValidator />
+				<ValidationSummary role="alert" />
+				<input type="hidden" name="IncidentReport.IncidentReportID" value="@IncidentReport!.IncidentReportID" />
+				<div class="mb-3">
+					<label for="reportdate" class="form-label">ReportDate:</label>
+					<InputDate id="reportdate" @bind-Value="IncidentReport.ReportDate" class="form-control" />
+					<ValidationMessage For="() => IncidentReport.ReportDate" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="modifiedtime" class="form-label">ModifiedTime:</label>
+					<InputDate id="modifiedtime" @bind-Value="IncidentReport.ModifiedTime" class="form-control" />
+					<ValidationMessage For="() => IncidentReport.ModifiedTime" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="details" class="form-label">Details:</label>
+					<InputText id="details" @bind-Value="IncidentReport.Details" class="form-control" />
+					<ValidationMessage For="() => IncidentReport.Details" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="honeypotid" class="form-label">Honeypot(ID / LOACTION):</label>
+					<InputSelect id="honeypotid" @bind-Value="IncidentReport.HoneypotID" class="form-control">
+						@foreach (var Honeypot in Honeypots!)
+						{
+							<option value="@Honeypot.HoneypotID">@Honeypot.HoneypotID / @Honeypot.Location</option>
+						}
+					</InputSelect>
+				</div>
+				<div class="mb-3">
+					<label for="attackid" class="form-label">Attack(ID / TYPE):</label>
+					<InputSelect id="attackid" @bind-Value="IncidentReport.AttackID" class="form-control">
+						@foreach (var Attack in Attacks!)
+						{
+							<option value="@Attack.AttackID">@Attack.AttackID / @Attack.AttackType</option>
+						}
+					</InputSelect>
+				</div>
+				<button type="submit" class="btn btn-primary">Save</button>
+			</EditForm>
+		</div>
+	</div>
+}
+
+<div>
+	<a href="/incidentreports">Back to List</a>
+</div>
+
+@code {
+	[SupplyParameterFromQuery]
+	private int IncidentReportID { get; set; }
+
+	[SupplyParameterFromForm]
+	private IncidentReport? IncidentReport { get; set; }
+
+
+	private List<Honeypot>? Honeypots;
+	private List<Attack>? Attacks;
+
+	protected override async Task OnInitializedAsync()
+	{
+		using var context = DbFactory.CreateDbContext();
+		IncidentReport ??= await context.IncidentReport.FirstOrDefaultAsync(m => m.IncidentReportID == IncidentReportID);
+
+		if (IncidentReport is null)
+		{
+			NavigationManager.NavigateTo("notfound");
+		}
+		else
+		{
+			Honeypots = await context.Honeypot.ToListAsync<Honeypot>();
+			Attacks = await context.Attack.ToListAsync<Attack>();
+		}
+	}
+
+	// To protect from overposting attacks, enable the specific properties you want to bind to.
+	// For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+	private async Task UpdateIncidentReport()
+	{
+		using var context = DbFactory.CreateDbContext();
+		context.Attach(IncidentReport!).State = EntityState.Modified;
+
+		try
+		{
+			await context.SaveChangesAsync();
+		}
+		catch (DbUpdateConcurrencyException)
+		{
+			if (!IncidentReportExists(IncidentReport!.IncidentReportID))
+			{
+				NavigationManager.NavigateTo("notfound");
+			}
+			else
+			{
+				throw;
+			}
+		}
+
+		NavigationManager.NavigateTo("/incidentreports");
+	}
+
+	private bool IncidentReportExists(int incidentreportid)
+	{
+		using var context = DbFactory.CreateDbContext();
+		return context.IncidentReport.Any(e => e.IncidentReportID == incidentreportid);
+	}
+}

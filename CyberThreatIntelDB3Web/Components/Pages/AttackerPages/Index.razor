@@ -1,0 +1,39 @@
+﻿@page "/attackers"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using DataAccess
+@using CyberThreatIntelDB3Web.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+
+<PageTitle>Attackers</PageTitle>
+
+<h1>Attackers</h1>
+
+<p>
+    <a href="attackers/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Attacker">
+    <PropertyColumn Property="attacker => attacker.IPAddress" Title="IP Address" />
+    <PropertyColumn Property="attacker => attacker.FirstSeen" Title="First Seen" />
+    <PropertyColumn Property="attacker => attacker.Country" />
+    <PropertyColumn Property="attacker => attacker.LastActivity" Title="Last Activity" />
+
+    <TemplateColumn Context="attacker">
+        <a href="@($"attackers/edit?attackerid={attacker.AttackerID}")">Edit</a> |
+        <a href="@($"attackers/details?attackerid={attacker.AttackerID}")">Details</a> |
+        <a href="@($"attackers/delete?attackerid={attacker.AttackerID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private CyberThreatIntelDB3WebContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

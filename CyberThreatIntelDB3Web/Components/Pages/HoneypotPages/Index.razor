@@ -1,0 +1,39 @@
+﻿@page "/honeypots"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using DataAccess
+@using CyberThreatIntelDB3Web.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+
+<PageTitle>Honeypots</PageTitle>
+
+<h1>Honeypots</h1>
+
+<p>
+    <a href="honeypots/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Honeypot">
+    <PropertyColumn Property="honeypot => honeypot.Location" />
+    <PropertyColumn Property="honeypot => honeypot.IPRange" Title="IP Range" />
+    <PropertyColumn Property="honeypot => honeypot.Status" />
+    <PropertyColumn Property="honeypot => honeypot.ModifiedTime" Title="Modified Time" />
+
+    <TemplateColumn Context="honeypot">
+        <a href="@($"honeypots/edit?honeypotid={honeypot.HoneypotID}")">Edit</a> |
+        <a href="@($"honeypots/details?honeypotid={honeypot.HoneypotID}")">Details</a> |
+        <a href="@($"honeypots/delete?honeypotid={honeypot.HoneypotID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private CyberThreatIntelDB3WebContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,52 @@
+﻿@page "/honeypots/details"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Honeypot</h2>
+    <hr />
+    @if (honeypot is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Location</dt>
+            <dd class="col-sm-10">@honeypot.Location</dd>
+            <dt class="col-sm-2">IPRange</dt>
+            <dd class="col-sm-10">@honeypot.IPRange</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@honeypot.Status</dd>
+            <dt class="col-sm-2">ModifiedTime</dt>
+            <dd class="col-sm-10">@honeypot.ModifiedTime</dd>
+        </dl>
+        <div>
+            <a href="@($"/honeypots/edit?honeypotid={honeypot.HoneypotID}")">Edit</a> |
+            <a href="@($"/honeypots")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Honeypot? honeypot;
+
+    [SupplyParameterFromQuery]
+    private int HoneypotID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        honeypot = await context.Honeypot.FirstOrDefaultAsync(m => m.HoneypotID == HoneypotID);
+
+        if (honeypot is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

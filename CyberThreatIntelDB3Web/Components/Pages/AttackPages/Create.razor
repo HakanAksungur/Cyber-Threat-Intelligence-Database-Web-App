@@ -1,0 +1,106 @@
+﻿@page "/attacks/create"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+@if (Honeypots == null | Attackers == null | Vulnerabilities == null)
+{
+	<p>Loading...</p>
+}
+else
+{
+
+
+	<h1>Create</h1>
+
+	<h2>Attack</h2>
+	<hr />
+	<div class="row">
+		<div class="col-md-4">
+			<EditForm method="post" Model="Attack" OnValidSubmit="AddAttack" FormName="create" Enhance>
+				<DataAnnotationsValidator />
+				<ValidationSummary class="text-danger" role="alert" />
+				<div class="mb-3">
+					<label for="timestamp" class="form-label">Timestamp:</label>
+					<InputDate id="timestamp" @bind-Value="Attack.Timestamp" class="form-control" />
+					<ValidationMessage For="() => Attack.Timestamp" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="severity" class="form-label">Severity:</label>
+					<InputText id="severity" @bind-Value="Attack.Severity" class="form-control" />
+					<ValidationMessage For="() => Attack.Severity" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="attacktype" class="form-label">AttackType:</label>
+					<InputText id="attacktype" @bind-Value="Attack.AttackType" class="form-control" />
+					<ValidationMessage For="() => Attack.AttackType" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="honeypotid" class="form-label">Honeypot(ID / LOACTION):</label>
+					<InputSelect id="honeypotid" @bind-Value="Attack.HoneypotID" class="form-control">
+						@foreach (var Honeypot in Honeypots!)
+						{
+							<option value="@Honeypot.HoneypotID">@Honeypot.HoneypotID / @Honeypot.Location</option>
+						}
+					</InputSelect>
+				</div>
+				<div class="mb-3">
+					<label for="attackerid" class="form-label">Attacker(ID / IP):</label>
+					<InputSelect id="attackerid" @bind-Value="Attack.AttackerID" class="form-control">
+						@foreach (var Attacker in Attackers!)
+						{
+							<option value="@Attacker.AttackerID">@Attacker.AttackerID / @Attacker.IPAddress</option>
+						}
+					</InputSelect>
+				</div>
+				<div class="mb-3">
+					<label for="vulnerabilityid" class="form-label">Vulnerability(ID / CVE):</label>
+					<InputSelect id="vulnerabilityid" @bind-Value="Attack.VulnerabilityID" class="form-control">
+						@foreach (var Vulnerability in Vulnerabilities!)
+						{
+							<option value="@Vulnerability.VulnerabilityID">@Vulnerability.VulnerabilityID / @Vulnerability.CVEIdentifier</option>
+						}
+					</InputSelect>
+				</div>
+				<button type="submit" class="btn btn-primary">Create</button>
+			</EditForm>
+		</div>
+	</div>
+
+	<div>
+		<a href="/attacks">Back to List</a>
+	</div>
+}
+@code {
+	[SupplyParameterFromForm]
+	private Attack Attack { get; set; } = new();
+
+
+	private List<Honeypot>? Honeypots;
+	private List<Attacker>? Attackers;
+	private List<Vulnerability>? Vulnerabilities;
+
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		using var context = DbFactory.CreateDbContext();
+
+		Honeypots = await context.Honeypot.ToListAsync<Honeypot>();
+		Attackers = await context.Attacker.ToListAsync<Attacker>();
+		Vulnerabilities = await context.Vulnerability.ToListAsync<Vulnerability>();
+
+	}
+
+	// To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+	private async Task AddAttack()
+	{
+		using var context = DbFactory.CreateDbContext();
+		context.Attack.Add(Attack);
+		await context.SaveChangesAsync();
+		NavigationManager.NavigateTo("/attacks");
+	}
+}

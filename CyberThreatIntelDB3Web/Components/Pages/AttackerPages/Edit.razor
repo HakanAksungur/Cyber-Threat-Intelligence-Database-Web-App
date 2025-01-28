@@ -1,0 +1,104 @@
+﻿@page "/attackers/edit"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Attacker</h2>
+<hr />
+@if (Attacker is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Attacker" OnValidSubmit="UpdateAttacker" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Attacker.AttackerID" value="@Attacker.AttackerID" />
+                <div class="mb-3">
+                    <label for="ipaddress" class="form-label">IPAddress:</label>
+                    <InputText id="ipaddress" @bind-Value="Attacker.IPAddress" class="form-control" />
+                    <ValidationMessage For="() => Attacker.IPAddress" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="firstseen" class="form-label">FirstSeen:</label>
+                    <InputDate id="firstseen" @bind-Value="Attacker.FirstSeen" class="form-control" />
+                    <ValidationMessage For="() => Attacker.FirstSeen" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="country" class="form-label">Country:</label>
+                    <InputText id="country" @bind-Value="Attacker.Country" class="form-control" />
+                    <ValidationMessage For="() => Attacker.Country" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="lastactivity" class="form-label">LastActivity:</label>
+                    <InputDate id="lastactivity" @bind-Value="Attacker.LastActivity" class="form-control" />
+                    <ValidationMessage For="() => Attacker.LastActivity" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/attackers">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int AttackerID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Attacker? Attacker { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Attacker ??= await context.Attacker.FirstOrDefaultAsync(m => m.AttackerID == AttackerID);
+
+        if (Attacker is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateAttacker()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Attacker!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AttackerExists(Attacker!.AttackerID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/attackers");
+    }
+
+    private bool AttackerExists(int attackerid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Attacker.Any(e => e.AttackerID == attackerid);
+    }
+}

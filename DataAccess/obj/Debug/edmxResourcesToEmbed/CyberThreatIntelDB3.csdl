@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="CyberThreatIntelligenceDB3Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Attack">
+    <Key>
+      <PropertyRef Name="AttackID" />
+    </Key>
+    <Property Name="AttackID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Severity" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="AttackType" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="HoneypotID" Type="Int32" Nullable="false" />
+    <Property Name="AttackerID" Type="Int32" Nullable="false" />
+    <Property Name="VulnerabilityID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Attacker" Relationship="Self.FK__Attack__Attacker__4222D4EF" FromRole="Attack" ToRole="Attacker" />
+    <NavigationProperty Name="Honeypot" Relationship="Self.FK__Attack__Honeypot__412EB0B6" FromRole="Attack" ToRole="Honeypot" />
+    <NavigationProperty Name="Vulnerability" Relationship="Self.FK__Attack__Vulnerab__4316F928" FromRole="Attack" ToRole="Vulnerability" />
+    <NavigationProperty Name="IncidentReports" Relationship="Self.FK__IncidentR__Attac__4D94879B" FromRole="Attack" ToRole="IncidentReport" />
+    <NavigationProperty Name="Malwares" Relationship="Self.FK__Malware__AttackI__49C3F6B7" FromRole="Attack" ToRole="Malware" />
+  </EntityType>
+  <EntityType Name="Attacker">
+    <Key>
+      <PropertyRef Name="AttackerID" />
+    </Key>
+    <Property Name="AttackerID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IPAddress" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="FirstSeen" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="Country" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="LastActivity" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Attacks" Relationship="Self.FK__Attack__Attacker__4222D4EF" FromRole="Attacker" ToRole="Attack" />
+  </EntityType>
+  <EntityType Name="Honeypot">
+    <Key>
+      <PropertyRef Name="HoneypotID" />
+    </Key>
+    <Property Name="HoneypotID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Location" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="IPRange" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="ModifiedTime" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Attacks" Relationship="Self.FK__Attack__Honeypot__412EB0B6" FromRole="Honeypot" ToRole="Attack" />
+    <NavigationProperty Name="IncidentReports" Relationship="Self.FK__IncidentR__Honey__4CA06362" FromRole="Honeypot" ToRole="IncidentReport" />
+  </EntityType>
+  <EntityType Name="IncidentReport">
+    <Key>
+      <PropertyRef Name="IncidentReportID" />
+    </Key>
+    <Property Name="IncidentReportID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ReportDate" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="ModifiedTime" Type="DateTime" Precision="3" />
+    <Property Name="Details" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="HoneypotID" Type="Int32" Nullable="false" />
+    <Property Name="AttackID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Attack" Relationship="Self.FK__IncidentR__Attac__4D94879B" FromRole="IncidentReport" ToRole="Attack" />
+    <NavigationProperty Name="Honeypot" Relationship="Self.FK__IncidentR__Honey__4CA06362" FromRole="IncidentReport" ToRole="Honeypot" />
+  </EntityType>
+  <EntityType Name="Malware">
+    <Key>
+      <PropertyRef Name="MalwareID" />
+    </Key>
+    <Property Name="MalwareID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Signature" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="AttackID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Attack" Relationship="Self.FK__Malware__AttackI__49C3F6B7" FromRole="Malware" ToRole="Attack" />
+  </EntityType>
+  <EntityType Name="Vulnerability">
+    <Key>
+      <PropertyRef Name="VulnerabilityID" />
+    </Key>
+    <Property Name="VulnerabilityID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CVEIdentifier" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="SeverityLevel" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Attacks" Relationship="Self.FK__Attack__Vulnerab__4316F928" FromRole="Vulnerability" ToRole="Attack" />
+  </EntityType>
+  <Association Name="FK__Attack__Attacker__4222D4EF">
+    <End Role="Attacker" Type="Self.Attacker" Multiplicity="1" />
+    <End Role="Attack" Type="Self.Attack" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Attacker">
+        <PropertyRef Name="AttackerID" />
+      </Principal>
+      <Dependent Role="Attack">
+        <PropertyRef Name="AttackerID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Attack__Honeypot__412EB0B6">
+    <End Role="Honeypot" Type="Self.Honeypot" Multiplicity="1" />
+    <End Role="Attack" Type="Self.Attack" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Honeypot">
+        <PropertyRef Name="HoneypotID" />
+      </Principal>
+      <Dependent Role="Attack">
+        <PropertyRef Name="HoneypotID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Attack__Vulnerab__4316F928">
+    <End Role="Vulnerability" Type="Self.Vulnerability" Multiplicity="1" />
+    <End Role="Attack" Type="Self.Attack" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Vulnerability">
+        <PropertyRef Name="VulnerabilityID" />
+      </Principal>
+      <Dependent Role="Attack">
+        <PropertyRef Name="VulnerabilityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__IncidentR__Attac__4D94879B">
+    <End Role="Attack" Type="Self.Attack" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="IncidentReport" Type="Self.IncidentReport" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Attack">
+        <PropertyRef Name="AttackID" />
+      </Principal>
+      <Dependent Role="IncidentReport">
+        <PropertyRef Name="AttackID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Malware__AttackI__49C3F6B7">
+    <End Role="Attack" Type="Self.Attack" Multiplicity="1" />
+    <End Role="Malware" Type="Self.Malware" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Attack">
+        <PropertyRef Name="AttackID" />
+      </Principal>
+      <Dependent Role="Malware">
+        <PropertyRef Name="AttackID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__IncidentR__Honey__4CA06362">
+    <End Role="Honeypot" Type="Self.Honeypot" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="IncidentReport" Type="Self.IncidentReport" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Honeypot">
+        <PropertyRef Name="HoneypotID" />
+      </Principal>
+      <Dependent Role="IncidentReport">
+        <PropertyRef Name="HoneypotID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="CyberThreatIntelligenceDB3Entities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Attacks" EntityType="Self.Attack" />
+    <EntitySet Name="Attackers" EntityType="Self.Attacker" />
+    <EntitySet Name="Honeypots" EntityType="Self.Honeypot" />
+    <EntitySet Name="IncidentReports" EntityType="Self.IncidentReport" />
+    <EntitySet Name="Malwares" EntityType="Self.Malware" />
+    <EntitySet Name="Vulnerabilities" EntityType="Self.Vulnerability" />
+    <AssociationSet Name="FK__Attack__Attacker__4222D4EF" Association="Self.FK__Attack__Attacker__4222D4EF">
+      <End Role="Attacker" EntitySet="Attackers" />
+      <End Role="Attack" EntitySet="Attacks" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Attack__Honeypot__412EB0B6" Association="Self.FK__Attack__Honeypot__412EB0B6">
+      <End Role="Honeypot" EntitySet="Honeypots" />
+      <End Role="Attack" EntitySet="Attacks" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Attack__Vulnerab__4316F928" Association="Self.FK__Attack__Vulnerab__4316F928">
+      <End Role="Vulnerability" EntitySet="Vulnerabilities" />
+      <End Role="Attack" EntitySet="Attacks" />
+    </AssociationSet>
+    <AssociationSet Name="FK__IncidentR__Attac__4D94879B" Association="Self.FK__IncidentR__Attac__4D94879B">
+      <End Role="Attack" EntitySet="Attacks" />
+      <End Role="IncidentReport" EntitySet="IncidentReports" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Malware__AttackI__49C3F6B7" Association="Self.FK__Malware__AttackI__49C3F6B7">
+      <End Role="Attack" EntitySet="Attacks" />
+      <End Role="Malware" EntitySet="Malwares" />
+    </AssociationSet>
+    <AssociationSet Name="FK__IncidentR__Honey__4CA06362" Association="Self.FK__IncidentR__Honey__4CA06362">
+      <End Role="Honeypot" EntitySet="Honeypots" />
+      <End Role="IncidentReport" EntitySet="IncidentReports" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

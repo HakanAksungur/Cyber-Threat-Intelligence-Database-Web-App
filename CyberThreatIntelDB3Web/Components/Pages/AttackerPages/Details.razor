@@ -1,0 +1,52 @@
+﻿@page "/attackers/details"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Attacker</h2>
+    <hr />
+    @if (attacker is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">IPAddress</dt>
+            <dd class="col-sm-10">@attacker.IPAddress</dd>
+            <dt class="col-sm-2">FirstSeen</dt>
+            <dd class="col-sm-10">@attacker.FirstSeen</dd>
+            <dt class="col-sm-2">Country</dt>
+            <dd class="col-sm-10">@attacker.Country</dd>
+            <dt class="col-sm-2">LastActivity</dt>
+            <dd class="col-sm-10">@attacker.LastActivity</dd>
+        </dl>
+        <div>
+            <a href="@($"/attackers/edit?attackerid={attacker.AttackerID}")">Edit</a> |
+            <a href="@($"/attackers")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Attacker? attacker;
+
+    [SupplyParameterFromQuery]
+    private int AttackerID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        attacker = await context.Attacker.FirstOrDefaultAsync(m => m.AttackerID == AttackerID);
+
+        if (attacker is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{5D030E3F-DE0D-4262-B857-86F4F409E4DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CyberThreatIntelDB3Web", "CyberThreatIntelDB3Web\CyberThreatIntelDB3Web.csproj", "{5AFC7AA9-CD86-4154-9EC9-DA5A2FD46BDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D030E3F-DE0D-4262-B857-86F4F409E4DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D030E3F-DE0D-4262-B857-86F4F409E4DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D030E3F-DE0D-4262-B857-86F4F409E4DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D030E3F-DE0D-4262-B857-86F4F409E4DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AFC7AA9-CD86-4154-9EC9-DA5A2FD46BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AFC7AA9-CD86-4154-9EC9-DA5A2FD46BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AFC7AA9-CD86-4154-9EC9-DA5A2FD46BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AFC7AA9-CD86-4154-9EC9-DA5A2FD46BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,51 @@
+﻿@page "/incidentreports"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using DataAccess
+@using CyberThreatIntelDB3Web.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+
+<PageTitle>Incident Reports</PageTitle>
+
+<h1>Incident Reports</h1>
+
+
+
+<p>
+    <a href="incidentreports/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.IncidentReport">
+    <PropertyColumn Property="incidentreport => incidentreport.ReportDate" Title="Report Date" />
+    <PropertyColumn Property="incidentreport => incidentreport.ModifiedTime" Title="Modified Time" />
+    <PropertyColumn Property="incidentreport => incidentreport.Details" />
+    <PropertyColumn Property="incidentreport => incidentreport.Honeypot.Location" Title="Honeypot Location" />
+    <PropertyColumn Property='(incidentreport) => (incidentreport.AttackID + " / " + incidentreport.Attack.AttackType)' Title="Attack Id/Type" />
+
+    <TemplateColumn Context="incidentreport">
+        <a href="@($"incidentreports/edit?incidentreportid={incidentreport.IncidentReportID}")">Edit</a> |
+        <a href="@($"incidentreports/details?incidentreportid={incidentreport.IncidentReportID}")">Details</a> |
+        <a href="@($"incidentreports/delete?incidentreportid={incidentreport.IncidentReportID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private CyberThreatIntelDB3WebContext context = default!;
+    private List<IncidentReport>? IncidentReports { get; set; }
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+        IncidentReports = context.IncidentReport.ToList();
+
+        foreach (IncidentReport incidentreport in IncidentReports)
+        {
+            incidentreport.Honeypot = context.Honeypot.Single<Honeypot>(e => e.HoneypotID == incidentreport.HoneypotID);
+            incidentreport.Attack = context.Attack.Single<Attack>(e => e.AttackID == incidentreport.AttackID);
+
+        }
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

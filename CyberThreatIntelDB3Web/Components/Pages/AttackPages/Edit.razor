@@ -1,0 +1,141 @@
+﻿@page "/attacks/edit"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Attack</h2>
+<hr />
+
+@if (Attack is null | Honeypots == null | Attackers == null | Vulnerabilities == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Attack" OnValidSubmit="UpdateAttack" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Attack.AttackID" value="@Attack!.AttackID" />
+                <div class="mb-3">
+                    <label for="timestamp" class="form-label">Timestamp:</label>
+                    <InputDate id="timestamp" @bind-Value="Attack.Timestamp" class="form-control" />
+                    <ValidationMessage For="() => Attack.Timestamp" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="severity" class="form-label">Severity:</label>
+                    <InputText id="severity" @bind-Value="Attack.Severity" class="form-control" />
+                    <ValidationMessage For="() => Attack.Severity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="attacktype" class="form-label">AttackType:</label>
+                    <InputText id="attacktype" @bind-Value="Attack.AttackType" class="form-control" />
+                    <ValidationMessage For="() => Attack.AttackType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="honeypotid" class="form-label">Honeypot(ID / LOACTION):</label>
+                    <InputSelect id="honeypotid" @bind-Value="Attack.HoneypotID" class="form-control">
+                        @foreach (var Honeypot in Honeypots!)
+                        {
+                            <option value="@Honeypot.HoneypotID">@Honeypot.HoneypotID / @Honeypot.Location</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label for="attackerid" class="form-label">Attacker(ID / IP):</label>
+                    <InputSelect id="attackerid" @bind-Value="Attack.AttackerID" class="form-control">
+                        @foreach (var Attacker in Attackers!)
+                        {
+                            <option value="@Attacker.AttackerID">@Attacker.AttackerID / @Attacker.IPAddress</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label for="vulnerabilityid" class="form-label">Vulnerability(ID / CVE):</label>
+                    <InputSelect id="vulnerabilityid" @bind-Value="Attack.VulnerabilityID" class="form-control">
+                        @foreach (var Vulnerability in Vulnerabilities!)
+                        {
+                            <option value="@Vulnerability.VulnerabilityID">@Vulnerability.VulnerabilityID / @Vulnerability.CVEIdentifier</option>
+                        }
+                    </InputSelect>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/attacks">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int AttackID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Attack? Attack { get; set; }
+
+
+
+    private List<Honeypot>? Honeypots;
+    private List<Attacker>? Attackers;
+    private List<Vulnerability>? Vulnerabilities;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Attack ??= await context.Attack.FirstOrDefaultAsync(m => m.AttackID == AttackID);
+
+        if (Attack is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        else
+        {
+            Honeypots = await context.Honeypot.ToListAsync<Honeypot>();
+            Attackers = await context.Attacker.ToListAsync<Attacker>();
+            Vulnerabilities = await context.Vulnerability.ToListAsync<Vulnerability>();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateAttack()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Attack!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AttackExists(Attack!.AttackID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/attacks");
+    }
+
+    private bool AttackExists(int attackid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Attack.Any(e => e.AttackID == attackid);
+    }
+}

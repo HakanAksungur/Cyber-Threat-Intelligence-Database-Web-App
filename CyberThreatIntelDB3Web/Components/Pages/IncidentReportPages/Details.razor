@@ -1,0 +1,54 @@
+﻿@page "/incidentreports/details"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>IncidentReport</h2>
+    <hr />
+    @if (incidentreport is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ReportDate</dt>
+            <dd class="col-sm-10">@incidentreport.ReportDate</dd>
+            <dt class="col-sm-2">ModifiedTime</dt>
+            <dd class="col-sm-10">@incidentreport.ModifiedTime</dd>
+            <dt class="col-sm-2">Details</dt>
+            <dd class="col-sm-10">@incidentreport.Details</dd>
+            <dt class="col-sm-2">HoneypotID</dt>
+            <dd class="col-sm-10">@incidentreport.HoneypotID</dd>
+            <dt class="col-sm-2">AttackID</dt>
+            <dd class="col-sm-10">@incidentreport.AttackID</dd>
+        </dl>
+        <div>
+            <a href="@($"/incidentreports/edit?incidentreportid={incidentreport.IncidentReportID}")">Edit</a> |
+            <a href="@($"/incidentreports")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private IncidentReport? incidentreport;
+
+    [SupplyParameterFromQuery]
+    private int IncidentReportID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        incidentreport = await context.IncidentReport.FirstOrDefaultAsync(m => m.IncidentReportID == IncidentReportID);
+
+        if (incidentreport is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

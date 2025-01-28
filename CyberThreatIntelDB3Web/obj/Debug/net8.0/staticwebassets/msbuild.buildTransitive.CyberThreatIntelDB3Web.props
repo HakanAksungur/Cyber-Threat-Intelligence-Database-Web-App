@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\CyberThreatIntelDB3Web.props" />
+</Project>

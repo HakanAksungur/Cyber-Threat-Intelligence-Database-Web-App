@@ -1,0 +1,59 @@
+﻿@page "/attackers/create"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Attacker</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Attacker" OnValidSubmit="AddAttacker" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="ipaddress" class="form-label">IPAddress:</label> 
+                <InputText id="ipaddress" @bind-Value="Attacker.IPAddress" class="form-control" /> 
+                <ValidationMessage For="() => Attacker.IPAddress" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="firstseen" class="form-label">FirstSeen:</label> 
+                <InputDate id="firstseen" @bind-Value="Attacker.FirstSeen" class="form-control" /> 
+                <ValidationMessage For="() => Attacker.FirstSeen" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="country" class="form-label">Country:</label> 
+                <InputText id="country" @bind-Value="Attacker.Country" class="form-control" /> 
+                <ValidationMessage For="() => Attacker.Country" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastactivity" class="form-label">LastActivity:</label> 
+                <InputDate id="lastactivity" @bind-Value="Attacker.LastActivity" class="form-control" /> 
+                <ValidationMessage For="() => Attacker.LastActivity" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/attackers">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Attacker Attacker { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddAttacker()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attacker.Add(Attacker);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/attackers");
+    }
+}

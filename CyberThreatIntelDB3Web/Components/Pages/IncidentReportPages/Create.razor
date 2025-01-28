@@ -1,0 +1,92 @@
+﻿@page "/incidentreports/create"
+@using Microsoft.EntityFrameworkCore
+@using DataAccess
+@inject IDbContextFactory<CyberThreatIntelDB3Web.Data.CyberThreatIntelDB3WebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+@if (Honeypots == null | Attacks == null)
+{
+	<p>Loading...</p>
+}
+else
+{
+	<h1>Create</h1>
+
+	<h2>IncidentReport</h2>
+	<hr />
+	<div class="row">
+		<div class="col-md-4">
+			<EditForm method="post" Model="IncidentReport" OnValidSubmit="AddIncidentReport" FormName="create" Enhance>
+				<DataAnnotationsValidator />
+				<ValidationSummary class="text-danger" role="alert" />
+				<div class="mb-3">
+					<label for="reportdate" class="form-label">ReportDate:</label>
+					<InputDate id="reportdate" @bind-Value="IncidentReport.ReportDate" class="form-control" />
+					<ValidationMessage For="() => IncidentReport.ReportDate" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="modifiedtime" class="form-label">ModifiedTime:</label>
+					<InputDate id="modifiedtime" @bind-Value="IncidentReport.ModifiedTime" class="form-control" />
+					<ValidationMessage For="() => IncidentReport.ModifiedTime" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="details" class="form-label">Details:</label>
+					<InputText id="details" @bind-Value="IncidentReport.Details" class="form-control" />
+					<ValidationMessage For="() => IncidentReport.Details" class="text-danger" />
+				</div>
+				<div class="mb-3">
+					<label for="honeypotid" class="form-label">Honeypot(ID / LOACTION):</label>
+					<InputSelect id="honeypotid" @bind-Value="IncidentReport.HoneypotID" class="form-control">
+						@foreach (var Honeypot in Honeypots!)
+						{
+							<option value="@Honeypot.HoneypotID">@Honeypot.HoneypotID / @Honeypot.Location</option>
+						}
+					</InputSelect>
+				</div>
+				<div class="mb-3">
+					<label for="attackid" class="form-label">Attack(ID / TYPE):</label>
+					<InputSelect id="attackid" @bind-Value="IncidentReport.AttackID" class="form-control">
+						@foreach (var Attack in Attacks!)
+						{
+							<option value="@Attack.AttackID">@Attack.AttackID / @Attack.AttackType</option>
+						}
+					</InputSelect>
+				</div>
+				<button type="submit" class="btn btn-primary">Create</button>
+			</EditForm>
+		</div>
+	</div>
+
+	<div>
+		<a href="/incidentreports">Back to List</a>
+	</div>
+}
+
+@code {
+	[SupplyParameterFromForm]
+	private IncidentReport IncidentReport { get; set; } = new();
+
+
+	private List<Honeypot>? Honeypots;
+	private List<Attack>? Attacks;
+
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		using var context = DbFactory.CreateDbContext();
+
+		Honeypots = await context.Honeypot.ToListAsync<Honeypot>();
+		Attacks = await context.Attack.ToListAsync<Attack>();
+	}
+
+	// To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+	private async Task AddIncidentReport()
+	{
+		using var context = DbFactory.CreateDbContext();
+		context.IncidentReport.Add(IncidentReport);
+		await context.SaveChangesAsync();
+		NavigationManager.NavigateTo("/incidentreports");
+	}
+}
